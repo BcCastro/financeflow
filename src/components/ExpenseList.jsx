@@ -1,117 +1,94 @@
 import React, { useContext, useState } from 'react';
 import { FinanceContext } from '../context/FinanceContext.jsx';
-import { Trash2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 
 export const ExpenseList = () => {
-  // Consumimos las transacciones y la función de eliminación del contexto global
   const { transactions, deleteTransaction } = useContext(FinanceContext);
+  const [filter, setFilter] = useState('todos');
 
-  // Estado local para controlar el filtro actual ('all', 'income', 'expense')
-  const [filter, setFilter] = useState('all');
-
-  // Filtramos el arreglo de transacciones según la opción seleccionada por el usuario
-  const filteredTransactions = transactions.filter(t => {
-    if (filter === 'income') return t.type === 'income';
-    if (filter === 'expense') return t.type === 'expense';
-    return true; // 'all' devuelve todo el historial
+  const filteredTransactions = transactions.filter((t) => {
+    if (filter === 'ingresos') return t.type === 'ingreso';
+    if (filter === 'gastos') return t.type === 'gasto';
+    return true;
   });
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-      {/* Cabecera del Historial e Interfaz de Filtros */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h3 className="text-xl font-bold text-gray-800">Historial de Movimientos</h3>
-          <p className="text-sm text-gray-400">Listado de tus operaciones recientes</p>
-        </div>
+  const currencySymbols = {
+    COP: '$',
+    USD: 'u$s ',
+    EUR: '€',
+    MXN: 'mx$ ',
+  };
 
-        {/* Botones de Filtro Estilizados */}
-        <div className="flex bg-gray-100 p-1 rounded-lg self-stretch sm:self-auto text-xs font-semibold">
-          <button 
-            onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-md transition ${filter === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h3 className="text-lg font-bold text-gray-900">Historial de Movimientos</h3>
+          <p className="text-xs text-gray-400 mt-0.5">Listado de tus operaciones recientes</p>
+        </div>
+        
+        {/* Filtros */}
+        <div className="flex bg-gray-100 p-1 rounded-xl text-xs font-semibold self-start sm:self-center">
+          <button
+            onClick={() => setFilter('todos')}
+            className={`px-3 py-1.5 rounded-lg transition ${filter === 'todos' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
           >
             Todos
           </button>
-          <button 
-            onClick={() => setFilter('income')}
-            className={`px-3 py-1.5 rounded-md transition ${filter === 'income' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-green-600'}`}
+          <button
+            onClick={() => setFilter('ingresos')}
+            className={`px-3 py-1.5 rounded-lg transition ${filter === 'ingresos' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-500 hover:text-green-600'}`}
           >
             Ingresos
           </button>
-          <button 
-            onClick={() => setFilter('expense')}
-            className={`px-3 py-1.5 rounded-md transition ${filter === 'expense' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500 hover:text-red-600'}`}
+          <button
+            onClick={() => setFilter('gastos')}
+            className={`px-3 py-1.5 rounded-lg transition ${filter === 'gastos' ? 'bg-white text-red-500 shadow-sm' : 'text-gray-500 hover:text-red-500'}`}
           >
             Gastos
           </button>
         </div>
       </div>
 
-      {/* Vista de Estado Vacío (Si no hay registros) */}
       {filteredTransactions.length === 0 ? (
-        <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-xl">
-          <p className="text-gray-400 text-sm">No se encontraron transacciones registradas.</p>
+        <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-2xl">
+          <p className="text-sm text-gray-400 font-medium">No se encontraron transacciones registradas.</p>
         </div>
       ) : (
-        /* Contenedor con overflow para asegurar que la tabla sea responsive en celulares */
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-100">
-            <thead>
-              <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
-                <th className="pb-3">Detalle</th>
-                <th className="pb-3">Categoría</th>
-                <th className="pb-3">Fecha</th>
-                <th className="pb-3 text-right">Monto</th>
-                <th className="pb-3 text-center">Acción</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
-              {filteredTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-50/80 transition-colors">
-                  
-                  {/* Detalle con Icono Dinámico */}
-                  <td className="py-3.5 flex items-center gap-3 font-medium text-gray-900">
-                    {transaction.type === 'income' ? (
-                      <ArrowUpCircle className="text-green-500 shrink-0" size={20} />
-                    ) : (
-                      <ArrowDownCircle className="text-red-500 shrink-0" size={20} />
-                    )}
-                    <span className="truncate max-w-[150px]">{transaction.description}</span>
-                  </td>
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+          {filteredTransactions.map((t) => {
+            const currentCurrency = t.currency || 'COP';
+            const symbol = currencySymbols[currentCurrency] || '$';
 
-                  {/* Categoría */}
-                  <td className="py-3.5">
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
-                      {transaction.category}
+            return (
+              <div
+                key={t.id}
+                className="flex items-center justify-between p-4 rounded-xl border border-gray-50 hover:bg-gray-50/50 transition group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${t.type === 'ingreso' ? 'bg-green-500' : 'bg-red-400'}`} />
+                  <div>
+                    <p className="text-sm font-bold text-gray-800">{t.description}</p>
+                    <span className="inline-block text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-medium mt-1">
+                      {t.category} ({currentCurrency})
                     </span>
-                  </td>
-
-                  {/* Fecha */}
-                  <td className="py-3.5 text-gray-400 text-xs">
-                    {transaction.date}
-                  </td>
-
-                  {/* Monto Dinámico (Verde para ingresos, Rojo para gastos) */}
-                  <td className={`py-3.5 text-right font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                  </td>
-
-                  {/* Botón de Eliminar Transacción */}
-                  <td className="py-3.5 text-center">
-                    <button 
-                      onClick={() => deleteTransaction(transaction.id)}
-                      className="text-gray-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition"
-                      title="Eliminar registro"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <span className={`text-sm font-black ${t.type === 'ingreso' ? 'text-green-600' : 'text-gray-900'}`}>
+                    {t.type === 'ingreso' ? '+' : '-'}{symbol}{t.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </span>
+                  <button
+                    onClick={() => deleteTransaction(t.id)}
+                    className="text-gray-300 hover:text-red-500 transition text-xs font-bold"
+                    title="Eliminar"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

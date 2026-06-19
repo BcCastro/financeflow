@@ -1,5 +1,5 @@
 import React from 'react';
-import { FinanceProvider } from './context/FinanceContext';
+import { FinanceProvider } from './context/FinanceContext.jsx';
 import { SummaryCards } from './components/SummaryCards';
 import { ExpenseForm } from './components/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList'; // Crear similar para listar con deleteTransaction

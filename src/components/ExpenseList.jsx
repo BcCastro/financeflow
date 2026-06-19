@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { FinanceContext } from '../context/FinanceContext';
+import { FinanceContext } from '../context/FinanceContext.jsx';
 import { Trash2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 
 export const ExpenseList = () => {

@@ -15,7 +15,7 @@ export const FinanceProvider = ({ children }) => {
   const addTransaction = (transaction) => {
     const newTransaction = {
       ...transaction,
-      id: crypto.randomUUID()
+      id: crypto.randomUUID() // Genera un ID único seguro
     };
     setTransactions([newTransaction, ...transactions]);
   };

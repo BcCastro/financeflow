@@ -1,7 +1,7 @@
 import React from 'react';
 import { SummaryCards } from './SummaryCards';
 import { ExpenseForm } from './ExpenseForm';
-import { ExpenseList } from './ExpenseList'; // Componente que renderiza el historial de transacciones
+import { ExpenseList } from './ExpenseList';// Componente que renderiza el historial de transacciones
 
 export const Dashboard = () => {
   return (
